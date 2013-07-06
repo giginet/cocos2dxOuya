@@ -4,5 +4,5 @@ proj.android/libs/*
 
 .classpath
 .settings
-!.project
+.project
 
