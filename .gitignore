@@ -1,3 +1,8 @@
 proj.android/obj/*
 proj.android/libs/*
 !proj.android/libs/ouya/*
+
+.classpath
+.settings
+!.project
+

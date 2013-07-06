@@ -83,9 +83,6 @@ bool HelloWorld::init()
 void HelloWorld::update(float dt) {
     Kawaz::OUYA::OuyaController *controller = Kawaz::OUYA::OuyaController::getControllerByPlayer(0);
     if (controller) {
-        if (controller->getButton(Kawaz::OUYA::OuyaController::BUTTON_O)) {
-            CCLOG("O was Pressed!");
-        }
         float x = controller->getAxisValue(Kawaz::OUYA::OuyaController::AXIS_LS_X);
         float y = -controller->getAxisValue(Kawaz::OUYA::OuyaController::AXIS_LS_Y);
         const float threshold = 0.001;
