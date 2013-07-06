@@ -87,9 +87,14 @@ void HelloWorld::update(float dt) {
             CCLOG("O was Pressed!");
         }
         float x = controller->getAxisValue(Kawaz::OUYA::OuyaController::AXIS_LS_X);
-        float y = controller->getAxisValue(Kawaz::OUYA::OuyaController::AXIS_LS_Y);
-        CCPoint vector = ccpMult(ccp(x, -y), 5.f);
-        _player->setPosition(ccpAdd(_player->getPosition(), vector));
+        float y = -controller->getAxisValue(Kawaz::OUYA::OuyaController::AXIS_LS_Y);
+        const float threshold = 0.001;
+        if (fabs(x) > threshold || fabs(y) > threshold) {
+            float deg = atan2(-y, x);
+            _player->setRotation((deg * 180 / M_PI) + 90);
+            CCPoint vector = ccpMult(ccp(x, y), 5.f);
+            _player->setPosition(ccpAdd(_player->getPosition(), vector));
+        }
     } else {
         CCLOG("controller is not found");
     }

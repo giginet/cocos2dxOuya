@@ -33,7 +33,7 @@ import android.view.MotionEvent;
 public class HelloOuya extends Cocos2dxActivity{
 
     protected void onCreate(Bundle savedInstanceState){
-        OuyaController.init(getBaseContext()); // Initialize OUYA Controller.
+        OuyaController.init(getApplicationContext()); // Initialize OUYA Controller.
         super.onCreate(savedInstanceState);
     }
 

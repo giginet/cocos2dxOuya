@@ -47,11 +47,4 @@ public class OuyaControllerJni{
         OuyaController.startOfFrame();
     }
     
-    public static float getAxisValue(int playerNum, int axisId) {
-        OuyaController controller = OuyaController.getControllerByPlayer(playerNum);
-        float axis = controller.getAxisValue(axisId);
-        System.out.println("axis = " + axis);
-        return axis;
-    }
-    
 }
