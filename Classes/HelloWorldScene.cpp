@@ -1,8 +1,8 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "cocos2d-ouya/OuyaController.h"
 
 using namespace cocos2d;
-using namespace CocosDenshion;
 
 CCScene* HelloWorld::scene()
 {
@@ -70,7 +70,11 @@ bool HelloWorld::init()
 
     // add the sprite as a child to this layer
     this->addChild(pSprite, 0);
-    
+    CCLog("max Player = %d", Kawaz::OUYA::OuyaController::MAX_CONTROLLERS);
+
+    Kawaz::OUYA::OuyaController *controller = Kawaz::OUYA::OuyaController::getControllerByPlayer(0);
+    //CCLog("controller = %p", controller);
+
     return true;
 }
 
