@@ -72,10 +72,27 @@ bool HelloWorld::init()
     this->addChild(pSprite, 0);
     CCLog("max Player = %d", Kawaz::OUYA::OuyaController::MAX_CONTROLLERS);
 
-    Kawaz::OUYA::OuyaController *controller = Kawaz::OUYA::OuyaController::getControllerByPlayer(0);
-    //CCLog("controller = %p", controller);
+    _player = CCSprite::create("player.png");
+    this->addChild(_player);
+
+    this->scheduleUpdate();
 
     return true;
+}
+
+void HelloWorld::update(float dt) {
+    Kawaz::OUYA::OuyaController *controller = Kawaz::OUYA::OuyaController::getControllerByPlayer(0);
+    if (controller) {
+        if (controller->getButton(Kawaz::OUYA::OuyaController::BUTTON_O)) {
+            CCLOG("O was Pressed!");
+        }
+        float x = controller->getAxisValue(Kawaz::OUYA::OuyaController::AXIS_LS_X);
+        float y = controller->getAxisValue(Kawaz::OUYA::OuyaController::AXIS_LS_Y);
+        CCPoint vector = ccpMult(ccp(x, -y), 5.f);
+        _player->setPosition(ccpAdd(_player->getPosition(), vector));
+    } else {
+        CCLOG("controller is not found");
+    }
 }
 
 void HelloWorld::menuCloseCallback(CCObject* pSender)

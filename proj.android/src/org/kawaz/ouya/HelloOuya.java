@@ -27,15 +27,36 @@ import org.cocos2dx.lib.Cocos2dxActivity;
 import tv.ouya.console.api.OuyaController;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 
 public class HelloOuya extends Cocos2dxActivity{
 
     protected void onCreate(Bundle savedInstanceState){
-        OuyaController.init(this); // Initialize OUYA Controller.
+        OuyaController.init(getBaseContext()); // Initialize OUYA Controller.
         super.onCreate(savedInstanceState);
     }
 
     static{
         System.loadLibrary("game");
     }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        boolean handled = OuyaController.onKeyDown(keyCode, event);
+        return handled || super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        boolean handled = OuyaController.onKeyUp(keyCode, event);
+        return handled || super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onGenericMotionEvent(MotionEvent event) {
+        boolean handled = OuyaController.onGenericMotionEvent(event);
+        return handled || super.onGenericMotionEvent(event);
+    }
+    
 }

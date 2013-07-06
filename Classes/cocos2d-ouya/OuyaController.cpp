@@ -8,7 +8,8 @@
 #include "OuyaController.h"
 #include "platform/android/jni/JniHelper.h"
 
-#define CLASS_NAME "org/kawaz/ouya/odk/OuyaControllerJni"
+#define WRAPPER_CLASS_NAME "org/kawaz/ouya/odk/OuyaControllerJni"
+#define CONTROLLER_CLASS_NAME "tv/ouya/console/api/OuyaController"
 
 JNIEnv *Kawaz::OUYA::OuyaController::getJNIEnv() {
     JavaVM* jvm = cocos2d::JniHelper::getJavaVM();
@@ -52,17 +53,18 @@ JNIEnv *Kawaz::OUYA::OuyaController::getJNIEnv() {
 }
 
 // get class and make it a global reference, release it at endJni().
-jclass Kawaz::OUYA::OuyaController::getClassID(JNIEnv *pEnv) {
-    jclass ret = pEnv->FindClass(CLASS_NAME);
+jclass Kawaz::OUYA::OuyaController::getClassID(JNIEnv *pEnv,
+        const char *className) {
+    jclass ret = pEnv->FindClass(className);
     if (!ret) {
-        CCLOG("Failed to find class of %s", CLASS_NAME);
+        CCLOG("Failed to find class of %s", className);
     }
 
     return ret;
 }
 
 bool Kawaz::OUYA::OuyaController::getStaticMethodInfo(JniMethodInfo &methodinfo,
-        const char *methodName, const char *paramCode) {
+        const char *className, const char *methodName, const char *paramCode) {
     jmethodID methodID = 0;
     JNIEnv *pEnv = 0;
     bool bRet = false;
@@ -73,7 +75,7 @@ bool Kawaz::OUYA::OuyaController::getStaticMethodInfo(JniMethodInfo &methodinfo,
             break;
         }
 
-        jclass classID = getClassID(pEnv);
+        jclass classID = getClassID(pEnv, className);
 
         methodID = pEnv->GetStaticMethodID(classID, methodName, paramCode);
         if (!methodID) {
@@ -91,39 +93,141 @@ bool Kawaz::OUYA::OuyaController::getStaticMethodInfo(JniMethodInfo &methodinfo,
     return bRet;
 }
 
+bool Kawaz::OUYA::OuyaController::getMethodInfo(JniMethodInfo &methodInfo,
+        const char *className, const char *methodName, const char *paramCode) {
+    jmethodID methodID = 0;
+    JNIEnv *pEnv = 0;
+    bool bRet = false;
+
+    do {
+        pEnv = getJNIEnv();
+        if (!pEnv) {
+            break;
+        }
+
+        jclass classID = getClassID(pEnv, className);
+
+        methodID = pEnv->GetMethodID(classID, methodName, paramCode);
+        if (!methodID) {
+            CCLOG("Failed to find method id of %s", methodName);
+            break;
+        }
+
+        methodInfo.classID = classID;
+        methodInfo.env = pEnv;
+        methodInfo.methodID = methodID;
+
+        bRet = true;
+    } while (0);
+
+    return bRet;
+}
+
 Kawaz::OUYA::OuyaController::OuyaController(jobject controllerObject) {
     _controller = controllerObject;
 }
 
 Kawaz::OUYA::OuyaController::~OuyaController() {
     // TODO Auto-generated destructor stub
+    JNIEnv *env = OuyaController::getJNIEnv();
+    env->DeleteLocalRef(_controller);
 }
 
-Kawaz::OUYA::OuyaController* Kawaz::OUYA::OuyaController::getControllerByDeviceId(int deviceId) {
+Kawaz::OUYA::OuyaController* Kawaz::OUYA::OuyaController::getControllerByDeviceId(
+        int deviceId) {
     JniMethodInfo methodInfo;
-    if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo, "getControllerByDeviceId", "(I)Ltv/ouya/console/api/OuyaController;")) {
+    if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo,
+            WRAPPER_CLASS_NAME, "getControllerByDeviceId",
+            "(I)Ltv/ouya/console/api/OuyaController;")) {
         return NULL;
     }
-    jobject cObj = methodInfo.env->CallStaticObjectMethod(methodInfo.classID, methodInfo.methodID, deviceId);
+    jobject cObj = methodInfo.env->CallStaticObjectMethod(methodInfo.classID,
+            methodInfo.methodID, deviceId);
     OuyaController *controller = new OuyaController(cObj);
     return controller;
 }
 
-Kawaz::OUYA::OuyaController* Kawaz::OUYA::OuyaController::getControllerByPlayer(int playerNum) {
+Kawaz::OUYA::OuyaController* Kawaz::OUYA::OuyaController::getControllerByPlayer(
+        int playerNum) {
     JniMethodInfo methodInfo;
-    if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo, "getControllerByPlayer", "(I)Ltv/ouya/console/api/OuyaController;")) {
+    if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo,
+            WRAPPER_CLASS_NAME, "getControllerByPlayer",
+            "(I)Ltv/ouya/console/api/OuyaController;")) {
         return NULL;
     }
-    jobject cObj = methodInfo.env->CallStaticObjectMethod(methodInfo.classID, methodInfo.methodID, playerNum);
+    jobject cObj = methodInfo.env->CallStaticObjectMethod(methodInfo.classID,
+            methodInfo.methodID, playerNum);
     OuyaController *controller = new OuyaController(cObj);
     return controller;
 }
 
 int Kawaz::OUYA::OuyaController::getPlayerNum() {
-    return 0;
+    JniMethodInfo methodInfo;
+    if (!Kawaz::OUYA::OuyaController::getMethodInfo(methodInfo,
+            CONTROLLER_CLASS_NAME, "getPlayerNum", "()I")) {
+        return 0;
+    }
+    int num = methodInfo.env->CallIntMethod(_controller, methodInfo.methodID);
+    return num;
 }
 
 int Kawaz::OUYA::OuyaController::getDeviceId() {
-    return 0;
+    JniMethodInfo methodInfo;
+    if (!Kawaz::OUYA::OuyaController::getMethodInfo(methodInfo,
+            CONTROLLER_CLASS_NAME, "getDeviceId", "()I")) {
+        return 0;
+    }
+    int deviceId = methodInfo.env->CallIntMethod(_controller,
+            methodInfo.methodID);
+    return deviceId;
 }
 
+bool Kawaz::OUYA::OuyaController::buttonChangedThisFrame(int ouyaButton) {
+    JniMethodInfo methodInfo;
+    if (!Kawaz::OUYA::OuyaController::getMethodInfo(methodInfo,
+            CONTROLLER_CLASS_NAME, "buttonChangeThisFrame", "(I)Z")) {
+        return false;
+    }
+    return methodInfo.env->CallBooleanMethod(_controller, methodInfo.methodID,
+            ouyaButton);
+}
+
+float Kawaz::OUYA::OuyaController::getAxisValue(int ouyaAxis) {
+    JniMethodInfo methodInfo;
+    if (!Kawaz::OUYA::OuyaController::getMethodInfo(methodInfo,
+            CONTROLLER_CLASS_NAME, "getAxisValue", "(I)F")) {
+        return 0;
+    }
+    jfloat f = methodInfo.env->CallFloatMethod(_controller, methodInfo.methodID, ouyaAxis);
+    methodInfo.env->DeleteLocalRef(methodInfo.classID);
+    return f;
+}
+
+bool Kawaz::OUYA::OuyaController::getButton(int ouyaButton) {
+    JniMethodInfo methodInfo;
+    if (!Kawaz::OUYA::OuyaController::getMethodInfo(methodInfo,
+            CONTROLLER_CLASS_NAME, "getButton", "(I)Z")) {
+        return false;
+    }
+    methodInfo.env->DeleteLocalRef(methodInfo.classID);
+    return methodInfo.env->CallBooleanMethod(_controller, methodInfo.methodID,
+            ouyaButton);
+}
+
+int Kawaz::OUYA::OuyaController::getPlayerNumByDeviceId(int deviceId) {
+    JniMethodInfo methodInfo;
+    if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo,
+            CONTROLLER_CLASS_NAME, "getPlayerNumByDeviceId", "(I)I")) {
+        return 0;
+    }
+    return methodInfo.env->CallStaticIntMethod(methodInfo.classID,
+            methodInfo.methodID, deviceId);
+}
+
+void Kawaz::OUYA::OuyaController::startOfFrame() {
+    JniMethodInfo methodInfo;
+    if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo,
+            WRAPPER_CLASS_NAME, "startOfFrame", "()V")) {
+    }
+    methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID);
+}

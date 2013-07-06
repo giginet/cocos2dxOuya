@@ -25,6 +25,31 @@ namespace Kawaz {
 
         class OuyaController {
 
+          private:
+            jobject _controller;
+            OuyaController(jobject controllerObject);
+            static JNIEnv *getJNIEnv();
+            static jclass getClassID(JNIEnv *pEnv, const char *className);
+            static bool getStaticMethodInfo(JniMethodInfo &methodinfo, const char *className, const char *methodName, const char *paramCode);
+            static bool getMethodInfo(JniMethodInfo &methodInfo, const char *className, const char *methodName, const char *paramCode);
+          public:
+            virtual ~OuyaController();
+            static OuyaController* getControllerByDeviceId(int deviceId);
+            static OuyaController* getControllerByPlayer(int playerNum);
+            static int getPlayerNumByDeviceId(int deviceId);
+            /*static bool onGenericMotionEvent();
+            static bool onKeyDown(int keyCode);
+            static bool onKeyUp(int keyCode);*/
+            static void startOfFrame();
+            int getDeviceId();
+            int getPlayerNum();
+            bool buttonChangedThisFrame(int ouyaButton);
+            float getAxisValue(int ouyaAxis);
+            bool getButton(int ouyaButton);
+
+            static const int MAX_CONTROLLERS = 4;
+            static const float STICK_DEADZONE = 0.25f;
+
             enum {
                 AXIS_L2 = 17,
                 AXIS_LS_X = 0,
@@ -48,23 +73,6 @@ namespace Kawaz {
                 BUTTON_U = 99,
                 BUTTON_Y = 100
             };
-
-          private:
-            jobject _controller;
-            OuyaController(jobject controllerObject);
-            static JNIEnv *getJNIEnv();
-            static jclass getClassID(JNIEnv *pEnv);
-            static bool getStaticMethodInfo(JniMethodInfo &methodinfo, const char *methodName, const char *paramCode);
-          public:
-            virtual ~OuyaController();
-            static OuyaController* getControllerByDeviceId(int deviceId);
-            static OuyaController* getControllerByPlayer(int playerNum);
-            int getDeviceId();
-            int getPlayerNum();
-            //int getControllerByDeviceId(int deviceId);
-
-            static const int MAX_CONTROLLERS = 4;
-            static const float STICK_DEADZONE = 0.25f;
         };
 
     }

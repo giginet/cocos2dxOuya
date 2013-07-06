@@ -5,6 +5,8 @@
 
 class HelloWorld : public cocos2d::CCLayer
 {
+private:
+    cocos2d::CCSprite *_player;
 public:
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();  
@@ -14,6 +16,8 @@ public:
     
     // a selector callback
     void menuCloseCallback(CCObject* pSender);
+
+    void update(float dt);
 
     // implement the "static node()" method manually
     CREATE_FUNC(HelloWorld);
