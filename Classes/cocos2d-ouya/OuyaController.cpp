@@ -8,7 +8,6 @@
 #include "OuyaController.h"
 #include "platform/android/jni/JniHelper.h"
 
-#define WRAPPER_CLASS_NAME "org/kawaz/ouya/odk/OuyaControllerJni"
 #define CONTROLLER_CLASS_NAME "tv/ouya/console/api/OuyaController"
 
 JNIEnv *Kawaz::OUYA::OuyaController::getJNIEnv() {
@@ -137,7 +136,7 @@ Kawaz::OUYA::OuyaController* Kawaz::OUYA::OuyaController::getControllerByDeviceI
         int deviceId) {
     JniMethodInfo methodInfo;
     if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo,
-            WRAPPER_CLASS_NAME, "getControllerByDeviceId",
+            CONTROLLER_CLASS_NAME, "getControllerByDeviceId",
             "(I)Ltv/ouya/console/api/OuyaController;")) {
         return NULL;
     }
@@ -151,7 +150,7 @@ Kawaz::OUYA::OuyaController* Kawaz::OUYA::OuyaController::getControllerByPlayer(
         int playerNum) {
     JniMethodInfo methodInfo;
     if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo,
-            WRAPPER_CLASS_NAME, "getControllerByPlayer",
+            CONTROLLER_CLASS_NAME, "getControllerByPlayer",
             "(I)Ltv/ouya/console/api/OuyaController;")) {
         return NULL;
     }
@@ -227,7 +226,7 @@ int Kawaz::OUYA::OuyaController::getPlayerNumByDeviceId(int deviceId) {
 void Kawaz::OUYA::OuyaController::startOfFrame() {
     JniMethodInfo methodInfo;
     if (!Kawaz::OUYA::OuyaController::getStaticMethodInfo(methodInfo,
-            WRAPPER_CLASS_NAME, "startOfFrame", "()V")) {
+            CONTROLLER_CLASS_NAME, "startOfFrame", "()V")) {
     }
     methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID);
 }
